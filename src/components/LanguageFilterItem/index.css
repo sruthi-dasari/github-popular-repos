@@ -1,7 +1,14 @@
 .language-filter-item-btn {
-  /* border: 1px solid #0284c7; */
-  border-radius: 10px;
-  /* color: #0284c7; */
+  border: none;
   color: #1e293b;
   background-color: #ffffff;
+  font-weight: 700;
+  font-family: 'Roboto';
+  font-size: 18px;
+}
+
+.highlight {
+  border: 1px solid #0284c7;
+  border-radius: 10px;
+  color: #0284c7;
 }
