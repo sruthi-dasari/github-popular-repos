@@ -16,3 +16,12 @@
   width: 350px;
   padding-left: 0px;
 }
+
+.repository-items-container {
+  list-style: none;
+}
+
+.failure-view-img {
+  height: 100px;
+  width: 100px;
+}
