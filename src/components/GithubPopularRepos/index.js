@@ -21,8 +21,8 @@ const apiStatusConstants = {
 
 class GithubPopularRepos extends Component {
   state = {
-    apiStatus: 'INITIAL',
-    GithubPopularReposData: '',
+    apiStatus: apiStatusConstants.initial,
+    githubPopularReposData: '',
     activeLanguageId: languageFiltersData[0].id,
   }
 
@@ -40,73 +40,81 @@ class GithubPopularRepos extends Component {
   })
 
   getData = async () => {
-    // this.setState({apiStatus: apiStatusConstants.loading})
+    this.setState({apiStatus: apiStatusConstants.loading})
     const {activeLanguageId} = this.state
 
-    // const url = `https://apis.ccbp.in/popular-repos?language=${activeLanguageId}`
-    const url = 'https://apis.ccbp.in/popular-repos'
-    // const options = {
-    //   method: 'GET',
-    // }
+    const url = `https://apis.ccbp.in/popular-repos?language=${activeLanguageId}`
+
+    // const url = 'https://apis.ccbp.in/popular-reposs'
     const response = await fetch(url)
     const data = await response.json()
 
-    console.log(`data: ${data}`)
+    console.log(response)
+    if (response.ok === true) {
+      const updatedData = {
+        popularRepos: data.popular_repos.map(eachItem =>
+          this.getFormattedData(eachItem),
+        ),
+      }
 
-    const updatedData = {
-      popularRepos: data.popular_repos.map(eachItem =>
-        this.getFormattedData(eachItem),
-      ),
+      console.log(updatedData)
+
+      this.setState({
+        githubPopularReposData: updatedData,
+        apiStatus: apiStatusConstants.success,
+      })
+    } else if (response.status === 401) {
+      this.setState({apiStatus: apiStatusConstants.failure})
     }
-
-    // console.log(updatedData)
-
-    this.setState({
-      GithubPopularReposData: updatedData,
-      apiStatus: apiStatusConstants.success,
-    })
   }
 
-  //   renderRepositoryItemsContainer = data => (
-  //     <div className="repository-items-container">
-  //       <RepositoryItem />
-  //     </div>
-  //   )
+  renderSuccessViewContainer = () => {
+    const {githubPopularReposData} = this.state
+    return (
+      <ul className="repository-items-container">
+        {githubPopularReposData.popularRepos.map(eachItem => (
+          <RepositoryItem repoItemDetails={eachItem} key={eachItem.id} />
+        ))}
+      </ul>
+    )
+  }
 
-  //   renderSuccessViewContainer = () => {
-  //     const {GithubPopularReposData} = this.state
-  //     this.renderRepositoryItemsContainer(GithubPopularReposData)
-  //   }
+  renderLoadingViewContainer = () => (
+    <div className="loading-view-container">
+      <div data-testid="loader">
+        <Loader type="ThreeDots" color="#0284c7" height={80} width={80} />
+      </div>
+    </div>
+  )
 
-  //   renderLoadingViewContainer = () => (
-  //     <div className="loading-view-container">
-  //       <div>
-  //         <Loader type="ThreeDots" color="#0284c7" height={80} width={80} />
-  //       </div>
-  //     </div>
-  //   )
+  renderFailureViewContainer = () => (
+    <img
+      src="https://assets.ccbp.in/frontend/react-js/api-failure-view.png"
+      alt="failure view"
+      className="failure-view-img"
+    />
+  )
 
-  //   renderViewContainer = () => {
-  //     const {apiStatus} = this.state
-  //     switch (apiStatus) {
-  //       case apiStatusConstants.initial:
-  //         return this.renderInitialViewContainer()
-  //       case apiStatusConstants.success:
-  //         return this.renderSuccessViewContainer()
-  //       case apiStatusConstants.failure:
-  //         return this.renderFailureViewContainer()
-  //       case apiStatusConstants.loading:
-  //         return this.renderLoadingViewContainer()
-  //       default:
-  //         return null
-  //     }
-  //   }
+  renderViewContainer = () => {
+    const {apiStatus} = this.state
+    switch (apiStatus) {
+      case apiStatusConstants.success:
+        return this.renderSuccessViewContainer()
+      case apiStatusConstants.failure:
+        return this.renderFailureViewContainer()
+      case apiStatusConstants.loading:
+        return this.renderLoadingViewContainer()
+      default:
+        return null
+    }
+  }
 
-  //   updateActiveLanguageId = id => {
-  //     this.setState({activeLanguageId: id}, this.getData)
-  //   }
+  updateActiveLanguageId = id => {
+    this.setState({activeLanguageId: id}, this.getData)
+  }
 
   render() {
+    const {activeLanguageId} = this.state
     return (
       <div className="github-popular-repos-container">
         <h1 className="main-heading">Popular</h1>
@@ -116,10 +124,11 @@ class GithubPopularRepos extends Component {
               itemDetails={eachItem}
               key={eachItem.id}
               updateActiveLanguageId={this.updateActiveLanguageId}
+              isActive={eachItem.id === activeLanguageId}
             />
           ))}
         </ul>
-        {/* {this.renderViewContainer()} */}
+        {this.renderViewContainer()}
       </div>
     )
   }
