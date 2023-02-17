@@ -9,12 +9,14 @@ class LanguageFilterItem extends Component {
   }
 
   render() {
-    const {itemDetails} = this.props
+    const {itemDetails, isActive} = this.props
     const {language} = itemDetails
+
+    const activeTabClassName = isActive ? 'active-tab-btn' : ''
     return (
       <button
         type="button"
-        className="language-filter-item-btn"
+        className={`language-filter-item-btn ${activeTabClassName}`}
         onClick={this.onClickLanguageFilterItem}
       >
         {language}
